@@ -18,7 +18,8 @@ namespace Scheduler
             //Variables
             List<string> parameters = new List<string>();//Holds the command line arguments
             List<string> textFile = new List<string>();//Hold the text file line by line
-            List<string> edited = new List<string>();
+            
+
             #region Reading Command Line Arguments          
             for (int i = 0; i < args.Length; i++)
             {
@@ -55,15 +56,30 @@ namespace Scheduler
                 Console.WriteLine(word);
             }
 
-            //seperate lines into a edited list
+            #region Formatting task so they are one element per row/column
 
-            Console.WriteLine("BEGIN EDITINGONS");
-            string[] test12 = { " ", "  "};
-            var test = textFile[1].Split(test12,System.StringSplitOptions.RemoveEmptyEntries);
-            
-            Console.WriteLine(test[0]);
-            Console.WriteLine(test[1]);
-            Console.WriteLine(test[2]);
+            //Console.WriteLine("BEGIN EDITINGONS");
+            string[] removeThis = { " ", "  " };
+
+            List<string> editedFiles = new List<string>();
+
+            for (int a = 0; a < textFile.Count; a++)
+            {
+                var allvalues = textFile[a].Split(removeThis, System.StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < allvalues.Length; i++)
+                {
+                    editedFiles.Add(allvalues[i]);
+                }
+                editedFiles.Add("-");
+            }
+
+            //foreach (var VARIABLE in editedFiles)
+            //{
+            //    Console.WriteLine(VARIABLE);
+            //}
+            //Console.WriteLine(editedFiles.Count);
+            #endregion
+
 
             if (parameters.Count == 3)
             {
