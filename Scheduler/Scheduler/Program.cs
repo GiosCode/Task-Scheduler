@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -65,7 +66,7 @@ namespace Scheduler
             string[] removeThis = { " ", "  " };
 
             List<string> editedFiles = new List<string>();//Does not contain the frist line
-            editedFiles.Add("-");
+            //editedFiles.Add("-");
             for (int a = 1; a < textFile.Count; a++)//The a = 1 makes it so first line is not included
             {
                 var allvalues = textFile[a].Split(removeThis, System.StringSplitOptions.RemoveEmptyEntries);
@@ -177,6 +178,46 @@ namespace Scheduler
         /// <param name="energyEff"></param>
         static void RM(List<string> tasks, string energyEff = null)
         {
+            int numTask = 0;
+            int location = 0;     
+            List<task> test = new List<task>();
+
+            for (int i = 0; i < tasks.Count; i++)//Gives you the number of tasks
+            {
+                if (tasks[i].Equals("-"))
+                {
+                    numTask++;
+                }
+            }
+
+            for (int i = 0; i < numTask; i++)//Adds specific tasks until end of list
+            {
+                while (!tasks[location].Equals("-"))
+                {
+                    test[i].name = tasks[location];
+                    test[i].periodDead = Int32.Parse(tasks[location + 1]);
+                    test[i].wcet1188 = Int32.Parse(tasks[location + 2]);
+                    test[i].wcet918 = Int32.Parse(tasks[location + 3]);
+                    test[i].wcet648 = Int32.Parse(tasks[location + 4]);
+                    test[i].wcet384 = Int32.Parse(tasks[location + 5]);
+                    location = location + 6; 
+                }
+                location++;
+            }
+                
+
+            //int time = 0;
+            //if (time == 1000)
+            //{
+            //    Console.WriteLine("Ran for 1000 Seconds");
+            //}
+            //else
+            //{
+            //    Console.Write(time + task1.name + time+task.runtime);
+            //}
+            
+
+
             if (energyEff == null)//No energy efficient
             {
 
@@ -209,17 +250,17 @@ namespace Scheduler
         public int wcet648 { get; set; }
         public int wcet384 { get; set; }
 
-        public task(List<string> thing)
-        {
-            name = thing[1];
-            periodDead = Int32.Parse(thing[2]);
-            wcet1188 = Int32.Parse(thing[3]);
-            wcet918 = Int32.Parse(thing[4]);
-            wcet648 = Int32.Parse(thing[5]);
-            wcet384 = Int32.Parse(thing[6]);
+        
 
-
-        }
+        //public task(List<string> thing)
+        //{
+        //    name = thing[1];
+        //    periodDead = Int32.Parse(thing[2]);
+        //    wcet1188 = Int32.Parse(thing[3]);
+        //    wcet918 = Int32.Parse(thing[4]);
+        //    wcet648 = Int32.Parse(thing[5]);
+        //    wcet384 = Int32.Parse(thing[6]);
+        //}
 
 
     }
