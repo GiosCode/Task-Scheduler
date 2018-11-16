@@ -28,7 +28,7 @@ namespace Scheduler
             for (int i = 0; i < args.Length; i++)
             {
                 parameters.Add(Convert.ToString(args[i]));
-                Console.WriteLine(parameters[i]);
+               // Console.WriteLine(parameters[i]);
             }
             #endregion
 
@@ -64,9 +64,19 @@ namespace Scheduler
 
             //Console.WriteLine("BEGIN EDITINGONS");
             string[] removeThis = { " ", "  " };
-
+            
             List<string> editedFiles = new List<string>();//Does not contain the frist line
             //editedFiles.Add("-");
+
+            //Parsing the First Line
+            List<string> firstLine = new List<string>();
+            var lineaUno = textFile[0].Split(removeThis, System.StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < lineaUno.Length; i++)
+            {
+                firstLine.Add(lineaUno[i]);
+            }
+            //Ending parsing first line
+
             for (int a = 1; a < textFile.Count; a++)//The a = 1 makes it so first line is not included
             {
                 var allvalues = textFile[a].Split(removeThis, System.StringSplitOptions.RemoveEmptyEntries);
@@ -99,6 +109,7 @@ namespace Scheduler
                 else if (parameters[1].Equals("RM") && parameters[2].Equals("EE"))
                 {
                     Console.WriteLine("You want RM W/ EE");
+                    RM(editedFiles,firstLine, parameters[2]);
                 }
                 else if (parameters[1].Equals("EDF"))
                 {
@@ -109,6 +120,7 @@ namespace Scheduler
                 else if (parameters[1].Equals("RM"))
                 {
                     Console.WriteLine("You want RM");
+                    RM(editedFiles,firstLine);
                 }
                 else
                 {
@@ -126,6 +138,7 @@ namespace Scheduler
                 else if (parameters[1].Equals("RM"))
                 {
                     Console.WriteLine("You want RM");
+                    RM(editedFiles,firstLine);
                 }
                 else
                 {
@@ -137,7 +150,7 @@ namespace Scheduler
                 Console.WriteLine("Please enter EDF or RM & optionally EE in format inputfile.txt EDF EE");
             }
 
-
+            Console.ReadKey();
         }
 
         /// <summary>
@@ -147,22 +160,59 @@ namespace Scheduler
         /// <param name="energyEff"></param>
         static void EDF(List<string> tasks, string energyEff = "NO")
         {
-            int timeCount = 1;//Execution time counter.
             
+            int numTask = 0;
+            int location = 0;
+            List<task> taskList = new List<task>();
+            
+            
+            for (int i = 0; i < tasks.Count; i++)//Gives you the number of tasks
+            {
+                if (tasks[i].Equals("-"))
+                {
+                    numTask++;
+                }
+            }
 
-            //Get priorities,
-            //get periods,
-            //Get runtimes,
+            for (int i = 0; i < numTask; i++)//Adds specific tasks until end of list
+            {
+                while (!tasks[location].Equals("-"))
+                {
+                    task test = new task();
+                    test.name = tasks[location];
+                    test.periodDead = Int32.Parse(tasks[location + 1]);
+                    test.wcet1188 = Int32.Parse(tasks[location + 2]);
+                    test.wcet918 = Int32.Parse(tasks[location + 3]);
+                    test.wcet648 = Int32.Parse(tasks[location + 4]);
+                    test.wcet384 = Int32.Parse(tasks[location + 5]);
+                    location = location + 6;
+                    taskList.Add(test);
+                }
+                location++;
+            }
+
+            //Arranging the lists into earliest deadline first
+            List<task> priorityList = taskList.OrderBy(o => o.periodDead).ToList();//https://stackoverflow.com/questions/3309188/how-to-sort-a-listt-by-a-property-in-the-object
+            Console.WriteLine("Your priority @ time 0 is");
+            foreach (var item in priorityList)
+            {
+                Console.Write(item.name + " ");
+            }
+            Console.WriteLine();
 
 
-            if(energyEff.Equals("NO"))//No energy efficient
+
+
+
+
+            if (energyEff.Equals("NO"))//No energy efficient
             {
 
-                Console.WriteLine("IMPLEMENT1");
+                Console.WriteLine("Terribly sorry I couldn't implement it");
             }
             else if(energyEff.Equals("EE"))
             {
-                Console.WriteLine("IMPLEMENT");
+                Console.WriteLine("Terribly sorry I couldn't implement it");
             }
             else
             {
@@ -176,13 +226,14 @@ namespace Scheduler
         /// </summary>
         /// <param name="tasks"></param>
         /// <param name="energyEff"></param>
-        static void RM(List<string> tasks, string energyEff = null)
+        static void RM(List<string> tasks, List<string> firstLine, string energyEff = null)
         {
+            
             int numTask = 0;
-            int location = 0;     
-            List<task> test = new List<task>();
+            int location = 0;
+            List<task> taskList = new List<task>();
 
-            for (int i = 0; i < tasks.Count; i++)//Gives you the number of tasks
+            for (int i = 0; i < tasks.Count; i++)//Gives you the number of tasks, redundant incase first line of txt file isn't there
             {
                 if (tasks[i].Equals("-"))
                 {
@@ -190,42 +241,114 @@ namespace Scheduler
                 }
             }
 
-            for (int i = 0; i < numTask; i++)//Adds specific tasks until end of list
+            for (int i = 0; i < numTask; i++)//Adds task to my list of task
             {
                 while (!tasks[location].Equals("-"))
                 {
-                    test[i].name = tasks[location];
-                    test[i].periodDead = Int32.Parse(tasks[location + 1]);
-                    test[i].wcet1188 = Int32.Parse(tasks[location + 2]);
-                    test[i].wcet918 = Int32.Parse(tasks[location + 3]);
-                    test[i].wcet648 = Int32.Parse(tasks[location + 4]);
-                    test[i].wcet384 = Int32.Parse(tasks[location + 5]);
-                    location = location + 6; 
+                    task test = new task();
+                    test.name = tasks[location];
+                    test.periodDead = Int32.Parse(tasks[location + 1]);
+                    test.wcet1188 = Int32.Parse(tasks[location + 2]);
+                    test.wcet918 = Int32.Parse(tasks[location + 3]);
+                    test.wcet648 = Int32.Parse(tasks[location + 4]);
+                    test.wcet384 = Int32.Parse(tasks[location + 5]);
+                    location = location + 6;
+                    taskList.Add(test);
                 }
                 location++;
             }
-                
 
-            //int time = 0;
-            //if (time == 1000)
-            //{
-            //    Console.WriteLine("Ran for 1000 Seconds");
-            //}
-            //else
-            //{
-            //    Console.Write(time + task1.name + time+task.runtime);
-            //}
-            
+            //check to see if scheduable
+            //Get U, if more than 1 not scheduable
+
+
+
+            //Arranging the lists into earliest period first. Order won't change since periods are cosntant
+            List<task> priorityList = taskList.OrderBy(o => o.periodDead).ToList();///https://stackoverflow.com/questions/3309188/how-to-sort-a-listt-by-a-property-in-the-object
+            Console.WriteLine("Your priority is the following");
+            foreach (var item in priorityList)
+            {
+                Console.Write(item.name + " ");
+            }
+            Console.WriteLine();
+            Console.WriteLine();
+
+            //Console.WriteLine(firstLine[1]);
+
+            bool cpuIdle = false;
+            int idleCounter = 0;
+            int lastRan = 0;
+            int currentRan = 0;
+            //bool lastIdle = false;
 
 
             if (energyEff == null)//No energy efficient
             {
+                for (int i = 0; i < priorityList.Count; i++)
+                {
+                    priorityList[i].notIdle = true;
+                }
+                
+                for (int time = 1; time <= Int32.Parse(firstLine[1]); time++)
+                {
+                    //Run top priority task that can run
+                    for (int i = 0; i < priorityList.Count; i++)
+                    {
+                        if(priorityList[i].notIdle == true)
+                        {
+                           //Console.WriteLine(time.ToString() +" " + priorityList[i].name);
+                            priorityList[i].ranFor++;
+                            cpuIdle = false;
+                            currentRan = i;
+                            //Console.WriteLine(priorityList[i].ranFor);
+                            break;
+                        }
+                        else
+                        {
+                            cpuIdle = true;
+                        }
+                    }
+                    //Display
+                    if (cpuIdle)
+                    {
+                        //Console.WriteLine("IDLE");
+                        idleCounter++;
+                    }
 
-
+                    if (currentRan != lastRan && cpuIdle != true)
+                    {
+                        Console.WriteLine(time - priorityList[lastRan].ranFor + " " + priorityList[lastRan].name + " " + priorityList[lastRan].ranFor);
+                        lastRan = currentRan; 
+                    }                   
+                    
+                    
+                    //What can't run
+                    for (int i = 0; i < priorityList.Count; i++)
+                    {
+                        if (priorityList[i].ranFor == priorityList[i].wcet1188)
+                        {
+                            priorityList[i].notIdle = false;
+                            //Console.WriteLine(time + " " + priorityList[i].name + " " + priorityList[i].wcet1188);
+                            
+                        }
+                    }
+                    //What can run
+                    for (int i = 0; i < priorityList.Count; i++)
+                    {
+                        if(time % priorityList[i].periodDead == 0)
+                        {
+                            priorityList[i].notIdle = true;
+                            priorityList[i].ranFor = 0;
+                        }
+                        
+                    }
+                    
+                }
+                Console.WriteLine("Total cycles IDLE = " + idleCounter);
             }
             else if (energyEff.Equals("EE"))
             {
-                Console.WriteLine("IMPLEMENT");
+                Console.WriteLine("Terribly sorry I couldn't implement it");
             }
             else
             {
@@ -240,6 +363,9 @@ namespace Scheduler
 
 
     }
+    /// <summary>
+    /// Info pertaining to a task.
+    /// </summary>
     class task
     {
 
@@ -249,18 +375,10 @@ namespace Scheduler
         public int wcet918 { get; set; }
         public int wcet648 { get; set; }
         public int wcet384 { get; set; }
+        public bool notIdle { get; set; }
+        public int ranFor { get; set; }
 
-        
-
-        //public task(List<string> thing)
-        //{
-        //    name = thing[1];
-        //    periodDead = Int32.Parse(thing[2]);
-        //    wcet1188 = Int32.Parse(thing[3]);
-        //    wcet918 = Int32.Parse(thing[4]);
-        //    wcet648 = Int32.Parse(thing[5]);
-        //    wcet384 = Int32.Parse(thing[6]);
-        //}
+    
 
 
     }
